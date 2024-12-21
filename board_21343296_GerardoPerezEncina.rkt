@@ -5,7 +5,7 @@
 (provide board-set-play-piece)
 (provide board-check-vertical-win)
 (provide board-check-horizontal-win)
-;(provide board-check-diagonal-win)
+(provide board-check-diagonal-win)
 ;(provide board-who-is-winner)
 
 
@@ -140,3 +140,57 @@
 ; Descripción: Verifica si hay 4 fichas consecutivas del mismo color en cualquier diagonal del tablero.
 ; Dominio: board (lista de listas que representa el tablero)
 ; Recorrido: int (1 si gana jugador 1, 2 si gana jugador 2, 0 si no hay ganador diagonal)
+
+(define (board-check-diagonal-win tablero)
+  (define (explorar-tablero tablero fila col)
+    (if (= fila 6)  
+        0
+        (if (= col 7)  
+            (explorar-tablero tablero (+ fila 1) 0)
+            (cond
+              [(equal? (list-ref (list-ref tablero fila) col) 0)  
+               (explorar-tablero tablero fila (+ col 1))]
+              [(encontrar-victoria tablero fila col "r") 1] 
+              [(encontrar-victoria tablero fila col "y") 2] 
+              [else (explorar-tablero tablero fila (+ col 1))])))) 
+
+  (explorar-tablero tablero 0 0))
+
+(define (encontrar-victoria tablero fila col ficha)
+  (if (string=? (list-ref (list-ref tablero fila) col) ficha)
+      (verificar-diagonales tablero fila col ficha)
+      #f))  
+
+(define (verificar-diagonales tablero fila col ficha)
+  (cond
+    [(verificar-diagonal-abajo-derecha tablero fila col ficha 0) #t]  
+    [(verificar-diagonal-abajo-izquierda tablero fila col ficha 0) #t]   
+    [else #f]))  
+
+(define (verificar-diagonal-abajo-derecha tablero fila col ficha contador)
+  (if (= contador 4)  
+      #t
+      (if (or (< fila 0) (>= fila 6) (< col 0) (>= col 7)) 
+          #f
+          (cond
+            [(equal? (list-ref (list-ref tablero fila) col) 0) #f]  
+            [(string=? (list-ref (list-ref tablero fila) col) ficha)
+             (verificar-diagonal-abajo-derecha tablero (+ fila 1) (+ col 1) ficha (+ contador 1))]  
+            [else #f]))))  
+
+(define (verificar-diagonal-abajo-izquierda tablero fila col ficha contador)
+  (if (= contador 4)  
+      #t
+      (if (or (< fila 0) (>= fila 6) (< col 0) (>= col 7)) 
+          #f
+          (cond
+            [(equal? (list-ref (list-ref tablero fila) col) 0) #f]  
+            [(string=? (list-ref (list-ref tablero fila) col) ficha)
+             (verificar-diagonal-abajo-izquierda tablero (+ fila 1) (- col 1) ficha (+ contador 1))]
+            [else #f])))) 
+
+
+
+
+
+
