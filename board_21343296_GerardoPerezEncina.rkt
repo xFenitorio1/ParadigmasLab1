@@ -4,7 +4,7 @@
 (provide board-can-play?)
 (provide board-set-play-piece)
 (provide board-check-vertical-win)
-;(provide board-check-horizontal-win)
+(provide board-check-horizontal-win)
 ;(provide board-check-diagonal-win)
 ;(provide board-who-is-winner)
 
@@ -18,7 +18,7 @@
 (define (crear-fila n)
   (if (= n 0)
       '()
-      (cons 'empty (crear-fila (- n 1)))))
+      (cons 0 (crear-fila (- n 1)))))
 
 ; ------------------------------------------------
 ; Nombre: board
@@ -40,7 +40,7 @@
 
 (define (board-can-play? board)
   (define (fila-tiene-espacio? fila)
-    (member 'empty fila)) 
+    (member 0 fila)) 
   (define (revisar-tablero filas)
     (if (null? filas)
         #f  
@@ -66,7 +66,7 @@
   (define (buscar-fila filas)
     (cond
       [(null? filas) '()]  
-      [(equal? (list-ref (car filas) column) 'empty) 
+      [(equal? (list-ref (car filas) column) 0) 
        (cons (colocar-en-fila (car filas) column) (cdr filas))]
       [else (cons (car filas) (buscar-fila (cdr filas)))])) 
 
@@ -81,23 +81,62 @@
 
 (define (board-check-vertical-win board)
 
-  (define (verificar-columna filas color consecutivas)
+
+  (define (verificar-columna columna color consecutivas)
     (cond
-      [(null? filas) 0] 
-      [(equal? (car (car filas)) color) 
-       (if (= (+ 1 consecutivas) 4) 
-           (if (equal? color 'red) 1 2)  
-           (verificar-columna (cdr filas) color (+ consecutivas 1)))]
-      [else (verificar-columna (cdr filas) color 0)]))  
+      [(null? columna) 0]  
+      [(equal? (car columna) color) 
+       (if (= (+ consecutivas 1) 4) 
+           (if (equal? color "r") 1 2)  
+           (verificar-columna (cdr columna) color (+ consecutivas 1)))] 
+      [else (verificar-columna (cdr columna) color 0)]))  
 
+  ; Función para verificar todas las columnas
   (define (verificar-todas-las-columnas columna)
-    (if (= columna 7) 
-        0 
-        (let ([resultado-red (verificar-columna (map (lambda (fila) (list-ref fila columna)) board) 'red 0)]
-              [resultado-yellow (verificar-columna (map (lambda (fila) (list-ref fila columna)) board) 'yellow 0)])
-          (cond
-            [(= resultado-red 1) 1] 
-            [(= resultado-yellow 2) 2] 
-            [else (verificar-todas-las-columnas (+ columna 1))])))) 
+    (if (= columna 7)  
+        0
+        (cond
+          [(= (verificar-columna (map (lambda (fila) (list-ref fila columna)) board) "r" 0) 1) 1]  ; Si el jugador 1 gana
+          [(= (verificar-columna (map (lambda (fila) (list-ref fila columna)) board) "y" 0) 2) 2]  ; Si el jugador 2 gana
+          [else (verificar-todas-las-columnas (+ columna 1))]))) 
 
+  ; Iniciar la verificación desde la primera columna
   (verificar-todas-las-columnas 0))
+
+
+; ------------------------------------------------
+
+; Nombre: board-check-horizontal-win
+; Descripción: Verifica si hay 4 fichas consecutivas del mismo color en cualquier fila.
+; Dominio: board (lista de listas que representa el tablero)
+; Recorrido: int (1 si gana jugador 1, 2 si gana jugador 2, 0 si no hay ganador horizontal)
+
+(define (board-check-horizontal-win board)
+
+
+  (define (verificar-fila fila color consecutivas)
+    (cond
+      [(null? fila) 0] 
+      [(equal? (car fila) color)
+       (if (= (+ consecutivas 1) 4)  
+           (if (equal? color "r") 1 2)  
+           (verificar-fila (cdr fila) color (+ consecutivas 1)))]  
+      [else (verificar-fila (cdr fila) color 0)]))  
+
+  ; Función para verificar todas las filas
+  (define (verificar-todas-las-filas fila)
+    (if (= fila (length board))  
+        0
+        (cond
+          [(= (verificar-fila (list-ref board fila) "r" 0) 1) 1]  ; Si el jugador 1 gana
+          [(= (verificar-fila (list-ref board fila) "y" 0) 2) 2]  ; Si el jugador 2 gana
+          [else (verificar-todas-las-filas (+ fila 1))])))  
+
+  (verificar-todas-las-filas 0))
+
+; ------------------------------------------------
+
+; Nombre: board-check-diagonal-win
+; Descripción: Verifica si hay 4 fichas consecutivas del mismo color en cualquier diagonal del tablero.
+; Dominio: board (lista de listas que representa el tablero)
+; Recorrido: int (1 si gana jugador 1, 2 si gana jugador 2, 0 si no hay ganador diagonal)
