@@ -192,11 +192,6 @@
 
 ; ------------------------------------------------
 
-; Nombre: board-who-is-winner
-; Descripción: Funcion que verifica quien es el que gano llamando a las demas funciones
-; Dominio: board (lista de listas que representa el tablero)
-; Recorrido: int (1 si gana jugador 1, 2 si gana jugador 2, 0 si no hay ganador diagonal)
-
 
 (define (board-who-is-winner board)
   (cond
