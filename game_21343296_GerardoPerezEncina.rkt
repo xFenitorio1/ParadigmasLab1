@@ -3,12 +3,12 @@
 (require "piece_21343296_GerardoPerezEncina.rkt");importa la pieza
 (require "board_21343296_GerardoPerezEncina.rkt")
 (provide game)
+(provide game-history)
 (provide game-is-draw?)
 ;(provide game-get-current-player)
 ;(provide game-get-board)
 ;(provide game-set-end)
 ;(provide game-player-set-move)
-;(provide game-history)
 ;(provide game-get-current-turn)
 
 
@@ -23,9 +23,12 @@
 
 ; ------------------------------------------------
 ; Nombre: game-history
-; Descripcion: 
-; Dominio: player1 (player) 
-; Recorrido:
+; Descripción: Devuelve el historial de movimientos de la partida.
+; Dominio: game (estructura del juego)
+; Recorrido: historial de movimientos (lista de listas)
+
+(define (game-history game)
+  (fifth game)) 
 
 ; ------------------------------------------------
 ; Nombre: game-is-draw?
@@ -48,5 +51,3 @@
          (= (player-remaining-pieces jugador2) 0)))
 
   (or tablero-lleno jugadores-sin-fichas))
-
-; ------------------------------------------------
