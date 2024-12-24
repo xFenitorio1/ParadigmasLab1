@@ -1,6 +1,7 @@
 #lang racket
 (provide player)
 (provide player-id player-name player-color player-wins player-loses player-draws player-remaining-pieces)
+(provide player-update-stats)
 
 
 
@@ -58,3 +59,25 @@
 ; Dominio: player
 ; Recorrido: remaining-pieces(int)
 (define (player-remaining-pieces player)  (caddr (cddddr player)))
+
+
+; ------------------------------------------------
+; Nombre: player-update-stats
+; Descripcion: Actualiza las estadisticas de los jugadores
+; Dominio: player
+; Recorrido: player
+(define (player-update-stats player result)
+  (cond
+    [(string=? result "win") 
+     (list (player-id player) (player-name player) (player-color player)
+           (+ (player-wins player) 1) (player-loses player) 
+           (player-draws player) (player-remaining-pieces player))]
+    [(string=? result "loss") 
+     (list (player-id player) (player-name player) (player-color player)
+           (player-wins player) (+ (player-loses player) 1) 
+           (player-draws player) (player-remaining-pieces player))]
+    [(string=? result "draw") 
+     (list (player-id player) (player-name player) (player-color player)
+           (player-wins player) (player-loses player) 
+           (+ (player-draws player) 1) (player-remaining-pieces player))]
+    [else player])) 
