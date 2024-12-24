@@ -5,7 +5,7 @@
 (provide game)
 (provide game-history)
 (provide game-is-draw?)
-;(provide game-get-current-player)
+(provide game-get-current-player)
 ;(provide game-get-board)
 ;(provide game-set-end)
 ;(provide game-player-set-move)
@@ -14,9 +14,9 @@
 
 ; ------------------------------------------------
 ; Nombre: game
-; Descripcion: 
-; Dominio: player1 (player) 
-; Recorrido: 
+; Descripcion: Constructor de la estructura del juego
+; Dominio: player1 (player), player2 (player), board (board), current-turn (int)
+; Recorrido: game (estructura del juego que incluye jugadores, tablero, turno y historial)
 
 (define (game player1 player2 board current-turn)
   (list player1 player2 board current-turn '())) ;El ultimo es para el historial
@@ -51,3 +51,14 @@
          (= (player-remaining-pieces jugador2) 0)))
 
   (or tablero-lleno jugadores-sin-fichas))
+
+; ------------------------------------------------
+; Nombre: game-get-current-player
+; Descripcion: Devuelve el jugador actual según el turno
+; Dominio: game (estructura del juego)
+; Recorrido: player (jugador actual)
+
+(define (game-get-current-player game)
+  (if (= (fourth game) 1)
+      (first game)   ; Retorna el primer jugador si el turno es 1
+      (second game)))
