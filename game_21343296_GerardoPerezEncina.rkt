@@ -7,7 +7,7 @@
 (provide game-is-draw?)
 (provide game-get-current-player)
 (provide game-get-board)
-;(provide game-set-end)
+(provide game-set-end)
 ;(provide game-player-set-move)
 ;(provide game-get-current-turn)
 
@@ -71,4 +71,45 @@
 
 (define (game-get-board game)
   (third game))
+
+; ------------------------------------------------
+; Nombre: game-set-end
+; Descripcion: Finaliza el juego actual, actualizando las estadísticas según el resultado
+; Dominio: game (estructura del juego)
+; Recorrido: game (estructura actualizada con el estado final del juego)
+
+(define (game-set-end game)
+  ; Extraer datos del juego
+  (define jugador1 (first game))
+  (define jugador2 (second game))
+  (define tablero (third game))
+  (define historial (fifth game))
+
+  ; Determinar el ganador o empate
+  (cond
+    [(= (board-who-is-winner tablero) 1) ; Si el jugador 1 gana
+     (list 
+      (player-update-stats jugador1 "win") ; Actualizar jugador 1 como ganador
+      (player-update-stats jugador2 "loss") ; Actualizar jugador 2 como perdedor
+      tablero ; Tablero sin cambios
+      0 ; Juego terminado
+      historial)] ; Mantener el historial
+
+    [(= (board-who-is-winner tablero) 2) ; Si el jugador 2 gana
+     (list 
+      (player-update-stats jugador1 "loss") ; Actualizar jugador 1 como perdedor
+      (player-update-stats jugador2 "win") ; Actualizar jugador 2 como ganador
+      tablero ; Tablero sin cambios
+      0 ; Juego terminado
+      historial)] ; Mantener el historial
+
+    [(game-is-draw? game) ; Si es empate
+     (list 
+      (player-update-stats jugador1 "draw") ; Actualizar jugador 1 como empate
+      (player-update-stats jugador2 "draw") ; Actualizar jugador 2 como empate
+      tablero ; Tablero sin cambios
+      0 ; Juego terminado
+      historial)] ; Mantener el historial
+
+    [else game])) ; Si no hay ganador ni empate, retorna el juego sin cambios
 
