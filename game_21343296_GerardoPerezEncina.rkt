@@ -6,7 +6,7 @@
 (provide game-history)
 (provide game-is-draw?)
 (provide game-get-current-player)
-;(provide game-get-board)
+(provide game-get-board)
 ;(provide game-set-end)
 ;(provide game-player-set-move)
 ;(provide game-get-current-turn)
@@ -62,3 +62,13 @@
   (if (= (fourth game) 1)
       (first game)   ; Retorna el primer jugador si el turno es 1
       (second game)))
+
+; ------------------------------------------------
+; Nombre: game-get-board
+; Descripcion: Devuelve el tablero actual del juego
+; Dominio: game (estructura del juego)
+; Recorrido: board (tablero actual del juego)
+
+(define (game-get-board game)
+  (third game))
+
