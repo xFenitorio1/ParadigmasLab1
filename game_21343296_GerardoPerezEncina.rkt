@@ -8,8 +8,7 @@
 (provide game-get-current-player)
 (provide game-get-board)
 (provide game-set-end)
-;(provide game-player-set-move)
-;(provide game-get-current-turn)
+(provide game-player-set-move)
 
 
 ; ------------------------------------------------
@@ -112,4 +111,82 @@
       historial)] ; Mantener el historial
 
     [else game])) ; Si no hay ganador ni empate, retorna el juego sin cambios
+
+
+; ------------------------------------------------
+; Nombre: game-player-set-move
+; Descripcion: Realiza un movimiento en el juego, actualizando el tablero, turno y jugadores
+; Dominio: game (estructura del juego), player (jugador actual), column (int)
+; Recorrido: game (estructura actualizada del juego después del movimiento)
+
+(define (game-player-set-move game player column)
+  ; Extraer datos del juego
+  (define turno-actual (fourth game))
+  (define jugador1 (first game))
+  (define jugador2 (second game))
+  (define tablero (third game))
+  (define historial (fifth game))
+
+  ; Verificar si es el turno del jugador correcto
+  (cond
+    [(and (= turno-actual 1) (not (equal? player jugador1)))
+     (error "Turno incorrecto para el jugador")]
+    [(and (= turno-actual 2) (not (equal? player jugador2)))
+     (error "Turno incorrecto para el jugador")]
+    [else #t]) ; Si el turno es correcto, continúa
+
+  ; Obtener el color del jugador actual
+  (define color (player-color player))
+
+  ; Colocar la pieza en el tablero
+  (define tablero-actualizado (board-set-play-piece tablero column color))
+
+  ; Reducir las fichas del jugador actual
+  (define jugador1-actualizado
+    (if (= turno-actual 1)
+        (list (player-id jugador1)
+              (player-name jugador1)
+              (player-color jugador1)
+              (player-wins jugador1)
+              (player-loses jugador1)
+              (player-draws jugador1)
+              (- (player-remaining-pieces jugador1) 1))
+        jugador1))
+
+  (define jugador2-actualizado
+    (if (= turno-actual 2)
+        (list (player-id jugador2)
+              (player-name jugador2)
+              (player-color jugador2)
+              (player-wins jugador2)
+              (player-loses jugador2)
+              (player-draws jugador2)
+              (- (player-remaining-pieces jugador2) 1))
+        jugador2))
+
+  ; Actualizar el historial (incluye ID, columna y color)
+  (define historial-actualizado
+    (append historial (list (list (player-id player) column color))))
+
+  ; Verificar si el juego ha terminado
+  (define ganador (board-who-is-winner tablero-actualizado))
+  (define es-empate (game-is-draw? (list jugador1-actualizado jugador2-actualizado tablero-actualizado turno-actual historial-actualizado)))
+
+  ; Si el juego ha terminado, actualizar estadísticas y finalizar
+  (if (or ganador es-empate)
+      (game-set-end (list 
+                     jugador1-actualizado
+                     jugador2-actualizado
+                     tablero-actualizado
+                     0
+                     historial-actualizado))
+
+      ; Si el juego continúa, actualizar el turno y retornar el estado actualizado
+      (list
+       jugador1-actualizado
+       jugador2-actualizado
+       tablero-actualizado
+       (if (= turno-actual 1) 2 1) ; Cambiar el turno al otro jugador
+       historial-actualizado)))
+
 

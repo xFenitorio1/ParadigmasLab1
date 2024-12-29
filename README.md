@@ -1,1 +1,1 @@
-# Paradigmas
+# Lab1_21343296_GerardoPerezEncina
